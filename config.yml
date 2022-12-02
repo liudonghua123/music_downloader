@@ -1,0 +1,8 @@
+playwright:
+  headless: false
+  slow_mo: 100
+
+common:
+  download_location: ./music
+  convert_to_mp3: False
+  player_wait_seconds: 10
