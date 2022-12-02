@@ -27,6 +27,10 @@ Notices: **If you want to use convert to mp3 feature, please install `ffmpeg` an
 - [ ] 163 music support
 - [ ] kuwo music support
 
+## Known issues
+
+- headless mode not works currently, need more time to investigate.
+
 ## License
 
 MIT License
