@@ -6,3 +6,4 @@ common:
   download_location: ./music
   convert_to_mp3: true
   player_wait_seconds: 10
+  remove_pre_convertion_file: true

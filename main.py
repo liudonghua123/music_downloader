@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 import ffmpeg
 import fire
 import requests
+import os
 import yaml
 from os.path import dirname, join, realpath
 from playwright.sync_api import sync_playwright
@@ -29,6 +30,7 @@ slow_mo: int = config['playwright']['slow_mo']
 download_location: str = config['common']['download_location']
 convert_to_mp3: bool = config['common']['convert_to_mp3']
 player_wait_seconds: int = config['common']['player_wait_seconds']
+remove_pre_convertion_file: bool = config['common']['remove_pre_convertion_file']
 
 
 @dataclass
@@ -85,8 +87,9 @@ class QQMusicDownloader:
             page = new_page_info.value
             logger.info(f'get new_page_info: {new_page_info}')
             # sometimes, the popup will not shonw up, the music played inmediately
-            # page.wait_for_selector('body > div > div.yqq-dialog-root')
-            # page.click('div.yqq-dialog-wrap div.yqq-dialog-content  div.popup__ft > button')
+            # if headless:
+            #   page.wait_for_selector('body > div > div.yqq-dialog-root')
+            #   page.click('div.yqq-dialog-wrap div.yqq-dialog-content  div.popup__ft > button')
             # wait for a few monments
             # sleep(player_wait_seconds)
             page.wait_for_selector(
@@ -104,9 +107,9 @@ class QQMusicDownloader:
         if original_extension != 'm4a':
             logger.warning(f'The music may be vip only!')
         music_file_name = f'{music.title}-{music.artist}.{original_extension}'
-        saved_file = join(download_location, music_file_name)
-        with open(saved_file, 'wb') as f:
-            logger.info(f'saved to {saved_file}')
+        music_file_path = join(download_location, music_file_name)
+        with open(music_file_path, 'wb') as f:
+            logger.info(f'saved to {music_file_path}')
             f.write(content)
         if convert_to_mp3:
             if original_extension == 'mp3':
@@ -114,8 +117,13 @@ class QQMusicDownloader:
                 return
             logger.info(
                 f'try to convert to mp3 using ffmpeg-python, please install ffmpeg first')
-            ffmpeg.input(join(download_location, music_file_name)).output(
-                join(download_location, f'{music.title}-{music.artist}.mp3')).run()
+            converted_file = join(
+                download_location, f'{music.title}-{music.artist}.mp3')
+            ffmpeg.input(music_file_path).output(
+                converted_file).run()
+            if remove_pre_convertion_file:
+                logger.info(f'remove pre-convertion file')
+                os.unlink(music_file_path)
 
 
 def main(song_id: str = '000Z9mNt109oQd'):
