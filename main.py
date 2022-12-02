@@ -102,7 +102,7 @@ class QQMusicDownloader:
         original_extension = music.original_file_name.split('.')[-1]
         # warning the user if the file extension is not m4a, maybe the music is vip only
         if original_extension != 'm4a':
-          logger.warning(f'The music may be vip only!')
+            logger.warning(f'The music may be vip only!')
         music_file_name = f'{music.title}-{music.artist}.{original_extension}'
         saved_file = join(download_location, music_file_name)
         with open(saved_file, 'wb') as f:
@@ -114,10 +114,8 @@ class QQMusicDownloader:
                 return
             logger.info(
                 f'try to convert to mp3 using ffmpeg-python, please install ffmpeg first')
-            stream = ffmpeg.input(music_file_name)
-            stream = ffmpeg.hflip(stream)
-            stream = ffmpeg.output(stream, f'{music.title}-{music.artist}.mp3')
-            ffmpeg.run(stream)
+            ffmpeg.input(join(download_location, music_file_name)).output(
+                join(download_location, f'{music.title}-{music.artist}.mp3')).run()
 
 
 def main(song_id: str = '000Z9mNt109oQd'):
